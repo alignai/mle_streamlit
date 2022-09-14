@@ -2,11 +2,11 @@ import matplotlib.pyplot as plt
 import streamlit as st
 import seaborn as sns
 import plotly.express as px
-from sklearn.linear_model import SGDRegressor, LinearRegression
+from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, make_scorer, r2_score
+from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import MinMaxScaler
 
 
@@ -86,6 +86,7 @@ def Linear_Regression_Model(data, target, features, normalize, test_size, return
     ypred = lr_model.predict(xtest)
     test_mse = mean_squared_error(ytest, ypred)
     test_r2 = r2_score(ytest, ypred)
+    
     # Return performance
     if return_metrics:
         st.markdown("##### Train MSE: %.2f" % train_mse)
