@@ -19,8 +19,6 @@ def run():
 
     build_header("AlignAI")
 
-    st.header("Exercise 0")
-
     # Load the data:
     data_file = os.path.join('data', 'space_trip.csv')
     data = pd.read_csv(data_file, index_col = 0)
@@ -66,7 +64,7 @@ def run():
     data.set_index('Month', inplace = True)
     data['Time'] = np.arange(len(data.index))
     st.session_state['data'] = data
-    
+
     st.header("Plotting our data")
     st.markdown("We use `maplotlib` and `seaborn` to create `regplots` of our data with the following function:")
     st.markdown("""

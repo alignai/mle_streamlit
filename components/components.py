@@ -10,7 +10,9 @@ def build_header(title):
     st.session_state['email'] = "<info@ikonosanalytics.com>"
     
     st.image(logo, caption=st.session_state['caption'])
-    st.markdown('<info@ikonosanalytics.com>')
 
     st.title(title)
+    st.markdown('<info@ikonosanalytics.com>')
+    
+    st.markdown('## [Colab Notebook](https://colab.research.google.com/drive/1EctVHf2Y1w7_HA6aFaEUpFVHqpZrphu3?usp=sharing)')
     return True
