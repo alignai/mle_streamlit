@@ -1,6 +1,13 @@
 import matplotlib.pyplot as plt
+import streamlit as st
 import seaborn as sns
 import plotly.express as px
+from sklearn.linear_model import SGDRegressor,LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, make_scorer, r2_score
+from sklearn.preprocessing import MinMaxScaler
 
 def plot_time_series(column_to_plot, data):
   """ Returns time series plot of specified column of data
@@ -32,3 +39,62 @@ def plotly_ts_plot(df, value, time_range= ['1992-01-01','2019-12-01']):
   fig = px.line(df, x=df.index, y=value, markers=True)
   fig.update_layout(title=f'Space Agency {value}')
   return fig
+
+def Linear_Regression_Model(data, target, features, normalize, test_size, return_metrics, plot_result):
+  """Returns Linear Regression Model, with performance metrics and plot of test period performance
+
+  Args:
+    data: (pandas dataframe) time series data
+    target: (str) target column for model
+    features: (list[str]) features to be used in model 
+    normalize: (bool) if true, training and testing features will be normalized
+    test_size: (float) value between 0 and 1 for size of test data split
+    return_metrics: (bool) if true, will print model training and testing set MSE and R2
+    plot_result: (bool) if true, will plot model testing period performance
+
+  Returns:
+    Print of model performance metrics if True
+    Plot Object if True
+  """
+  # Separate Data
+  data_int = data[[target]+features].copy().dropna()
+  X = data_int.loc[:,features]
+  y = data_int.loc[:,target]
+
+  xtrain, xtest, ytrain, ytest=train_test_split(X, y, test_size=test_size, shuffle = False)
+
+  # Normalize Feature Data
+  if normalize:
+    scaler =  MinMaxScaler()
+    xtrain = scaler.fit_transform(xtrain)
+    xtest = scaler.transform(xtest)
+
+  # Initiate Linear Regression Model
+  lr_model = LinearRegression()
+  lr_model.fit(xtrain, ytrain)
+
+  # Make Predictions
+  ytrain_pred=lr_model.predict(xtrain)
+  train_mse = mean_squared_error(ytrain_pred,ytrain)
+  train_r2 = r2_score(ytrain_pred,ytrain)
+
+  ypred=lr_model.predict(xtest)
+  test_mse = mean_squared_error(ytest, ypred)
+  test_r2 = r2_score(ytest, ypred)
+
+  # Plot
+  if plot_result:
+    x_ax = X.iloc[-len(xtest):].index
+    fig, x = plt.subplots()
+    x.scatter(x_ax, ytest, s=5, color="blue", label="original")
+    x.plot(x_ax, ypred, lw=0.8, color="red", label="predicted")
+    x.set_title('Linear Regresssion Model Test Performance')
+    x.legend()
+    st.pyplot(fig)
+  
+  # Return performance
+  if return_metrics:
+    st.markdown("**Train MSE**: %.2f" % train_mse)
+    st.markdown("**Train R2**: %.2f" % train_r2)
+    st.markdown("**Test MSE**: %.2f" % test_mse)
+    st.markdown("**Test R2**: %.2f" % test_r2)
