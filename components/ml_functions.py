@@ -98,3 +98,34 @@ def Linear_Regression_Model(data, target, features, normalize, test_size, return
     st.markdown("**Train R2**: %.2f" % train_r2)
     st.markdown("**Test MSE**: %.2f" % test_mse)
     st.markdown("**Test R2**: %.2f" % test_r2)
+
+
+def RF_Model(xtrain, ytrain, tuning_dict):
+  """Returns Random Forest model object with hyperparameter tuning if selected
+
+  Args:
+    xtrain: (pandas dataframe) time series features data
+    ytrain: (pandas series) time series target column data
+    tuning_dict: (dictionary) contains model training parameters and hyperparameter tuning parameters
+  
+  Returns:
+    sklearn RandomForest model object
+  """
+ 
+  if tuning_dict['hyperparameter_tune']:
+    # Initiate Random Forest Model
+    rf = RandomForestRegressor()
+    # Begin Random Grid Search
+    rf_random = RandomizedSearchCV(estimator = rf, 
+                                   param_distributions = tuning_dict['random_grid'], 
+                                   n_iter = tuning_dict['n_iter'], 
+                                   cv = tuning_dict['cv_folds'], verbose=2, random_state=tuning_dict['random_state'], n_jobs = -1)
+    rf_random.fit(xtrain, ytrain)
+    
+    return rf_random.best_estimator_
+    
+  else:
+    # Include the option to fit a fixed model
+    rf = RandomForestRegressor(**tuning_dict['fixed_grid'])
+    rf.fit(xtrain,ytrain)
+    return rf
